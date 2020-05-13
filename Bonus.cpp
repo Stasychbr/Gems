@@ -4,7 +4,7 @@
 #include <random>
 #include <QRandomGenerator>
 
-Gem* Bonus::target() {
+std::shared_ptr<Gem> Bonus::target() {
     std::uniform_int_distribution<int> distribution(-_radius, _radius);
     int targetRow, targetColumn;
     do {

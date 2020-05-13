@@ -80,7 +80,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BasicGem.cpp" />
     <ClCompile Include="Bonus.cpp" />
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -98,7 +97,6 @@
     <QtRcc Include="Game.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BasicGem.h" />
     <ClInclude Include="Bonus.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Gem.h" />

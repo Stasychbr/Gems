@@ -3,11 +3,12 @@
 
 class PaintCan : public Bonus {
 private:
-    Gem* chooseVictim(Gem* initiator);
+    std::shared_ptr<Gem> chooseVictim(std::shared_ptr<Gem> initiator);
 public:
     PaintCan(int posX, int posY, int size, QGraphicsItem* parent);
     ~PaintCan();
     virtual void bonusAction();
+    virtual void destroy();
 };
 
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <memory>
 #include "Gem.h"
 
 class Field: public QGraphicsItem {
@@ -12,11 +13,11 @@ private:
     static const int _bonusChance = 10; // chance = 1/n
     static const int _bonusNum = 1;
 
-    std::vector<std::vector<Gem*>> _gems;
+    std::vector<std::vector<std::shared_ptr<Gem>>> _gems;
     QRectF _area;
 
-    Gem* _selectedGem = NULL;
-    std::vector<Gem*> _toDestroy;
+    std::shared_ptr<Gem> _selectedGem = NULL;
+    std::vector<std::shared_ptr<Gem>> _toDestroy;
     std::array <int, _columns> _shifted;
     enum class LastCheckedGem {
         NO_CHECK,
@@ -26,7 +27,7 @@ private:
         RIGHT
     };
 
-    Gem* generateGem(int row, int column, int size);
+    std::shared_ptr<Gem> generateGem(int row, int column, int size);
 
     void SwapGems(int row, int col);
     void CheckSequence(int i, int j, LastCheckedGem destination, QColor const& color);
@@ -42,6 +43,6 @@ public:
     int rows();
     int columns();
     void SelectGem(int row, int col);
-    Gem* gemAt(int row, int column);
+    std::shared_ptr<Gem> gemAt(int row, int column);
 };
 

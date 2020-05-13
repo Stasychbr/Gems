@@ -7,7 +7,7 @@ private:
     static const int _bonusAniLen = 150;
     QPropertyAnimation* _bonusAnim = NULL;
 protected:
-    Gem* target();
+    std::shared_ptr<Gem> target();
 public:
     Bonus(int posX, int posY, int size, QGraphicsItem* parent);
     ~Bonus();

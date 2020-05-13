@@ -76,6 +76,13 @@ void Gem::unselectAnim() {
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+void Gem::destroyAnim() {
+    QPropertyAnimation* anim = new QPropertyAnimation(this, "scale");
+    anim->setDuration(_aniDesLen);
+    anim->setEndValue(0);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 int Gem::row() {
     return _posY;
 }
@@ -126,6 +133,10 @@ void Gem::select() {
 
 void Gem::unselect() {
     unselectAnim();
+}
+
+void Gem::destroy() {
+    //destroyAnim();
 }
 
 void Gem::updatePos() {

@@ -18,6 +18,7 @@ public:
 private:
     static const int _aniSwapLen = 400;
     static const int _aniSelLen = 150;
+    static const int _aniDesLen = 200;
     int _size = 0;
     int _posX = 0;
     int _posY = 0;
@@ -29,6 +30,7 @@ private:
     void slidingAnim(AnimationType type = AnimationType::MOVE);
     void selectAnim();
     void unselectAnim();
+    void destroyAnim();
 
 protected:
     Field* _field = NULL;
@@ -49,6 +51,7 @@ public:
     void changeColor(QColor color);
     void select();
     void unselect();
+    virtual void destroy();
 
     void updatePos();
 

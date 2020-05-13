@@ -10,7 +10,6 @@
 
 Field::Field(QRectF& area) {
     int size = (int)(fmin<double, double>(area.width(), area.height()) / fmax<int, int>(_rows, _columns));
-    
     _gems.resize(_rows);
     _shifted.fill(-1);
     for (int i = 0; i < _rows; i++) {
@@ -22,11 +21,11 @@ Field::Field(QRectF& area) {
 }
 
 Field::~Field() {
-    for (int i = 0; i < _rows; i++) {
+    /*for (int i = 0; i < _rows; i++) {
         for (int j = 0; j < _columns; j++) {
             delete _gems[i][j];
         }
-    }
+    }*/
 }
 
 QRectF Field::boundingRect() const {
@@ -48,7 +47,7 @@ int Field::columns() {
     return _columns;
 }
 
-Gem* Field::gemAt(int row, int column) {
+std::shared_ptr<Gem> Field::gemAt(int row, int column) {
     if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
         return NULL;
     }
@@ -78,19 +77,19 @@ void Field::SelectGem(int row, int col) {
     }
 }
 
-Gem* Field::generateGem(int row, int column, int size) {
+std::shared_ptr<Gem> Field::generateGem(int row, int column, int size) {
     std::uniform_int_distribution<int> distribution(0, _bonusChance);
     if (distribution(*QRandomGenerator::global()) == 0) {
         std::uniform_int_distribution<int> bonusChoice(1, _bonusNum);
         switch (bonusChoice(*QRandomGenerator::global())) {
         case 1:
-            return (Gem*)new PaintCan(column, row, size, this);
+            return std::shared_ptr<Gem>((Gem*)new PaintCan(column, row, size, this));
         default:
-            return new Gem(column, row, size, this);
+            return std::shared_ptr<Gem> (new Gem(column, row, size, this));
         }
     }
     else {
-        return new Gem(column, row, size, this);
+        return std::shared_ptr<Gem> (new Gem(column, row, size, this));
     }
 }
 
@@ -134,7 +133,7 @@ void Field::DestroySequence() {
                 _gems[i][gem->column()]->changeRow(i);
             }
             _gems[0][gem->column()] = generateGem(0, gem->column(), gem->size());
-            delete gem;
+            gem->destroy();
         }
 
     }
