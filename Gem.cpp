@@ -27,7 +27,7 @@ Gem::Gem(int posX, int posY, int size, QGraphicsItem* parent) {
         }
     }
     setParentItem(parent);
-    slidingAnim(AnimationType::DESTROY);
+    slidingAnim(AnimationType::CREATE);
 }
 
 Gem::Gem(const Gem& t) {
@@ -50,7 +50,7 @@ QPointF Gem::calcPos() {
 
 void Gem::slidingAnim(AnimationType type) {
     QPropertyAnimation* anim = new QPropertyAnimation(this, "pos");
-    if (type == AnimationType::DESTROY) {
+    if (type == AnimationType::CREATE) {
         anim->setStartValue(calcPos() - QPointF{ 0, (double)_size });
     }
     if (type == AnimationType::SWAP) {
@@ -75,13 +75,6 @@ void Gem::unselectAnim() {
     anim->setEndValue(1);
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
-
-//void Gem::destroyAnim() {
-//    QPropertyAnimation* anim = new QPropertyAnimation(this, "scale");
-//    anim->setDuration(_aniDesLen);
-//    anim->setEndValue(0);
-//    anim->start(QAbstractAnimation::DeleteWhenStopped);
-//}
 
 int Gem::row() {
     return _posY;
@@ -136,7 +129,6 @@ void Gem::unselect() {
 }
 
 void Gem::destroy() {
-    //destroyAnim();
 }
 
 void Gem::updatePos() {

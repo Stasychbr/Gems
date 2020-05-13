@@ -7,6 +7,7 @@
 #include <QRandomGenerator>
 #include <random>
 #include "PaintCan.h"
+#include "Bomb.h"
 
 Field::Field(QRectF& area) {
     int size = (int)(fmin<double, double>(area.width(), area.height()) / fmax<int, int>(_rows, _columns));
@@ -43,7 +44,11 @@ int Field::columns() {
 }
 
 void Field::CheckLater(std::shared_ptr<Gem> gem) {
-    _toCheck.push_back(gem);
+    _checkQuery.push_back(gem);
+}
+
+void Field::DestroyLater(std::shared_ptr<Gem> gem) {
+    _destroyQuery.push_back(gem);
 }
 
 std::shared_ptr<Gem> Field::gemAt(int row, int column) {
@@ -60,16 +65,15 @@ void Field::SelectGem(int row, int col) {
     }
     else {
         _selectedGem->unselect();
-        int tmpRow = _selectedGem->row(); //!
-        int tmpCol = _selectedGem->column(); //!
+        int tmpRow = _selectedGem->row(); 
+        int tmpCol = _selectedGem->column(); 
         if (abs(tmpRow - row) == 1 && tmpCol == col || abs(tmpCol - col) == 1 && tmpRow == row) {
             SwapGems(row, col);
             CheckGem(row, col);
             CheckGem(tmpRow, tmpCol);
-            for (int i = 0; i < _toCheck.size(); i++) {
-                CheckGem(_toCheck[i]->row(), _toCheck[i]->column());
-            }
-            _toCheck.clear();
+            execCheckQuery();
+            execDestroyQuery();
+            CheckWholeField();
         }
         _selectedGem = NULL;
     }
@@ -88,6 +92,8 @@ std::shared_ptr<Gem> Field::generateGem(int row, int column, int size) {
         switch (bonusChoice(*QRandomGenerator::global())) {
         case 1:
             return std::shared_ptr<Gem>((Gem*)new PaintCan(column, row, size, this));
+        case 2:
+            return std::shared_ptr<Gem>((Gem*)new Bomb(column, row, size, this));
         default:
             return std::shared_ptr<Gem> (new Gem(column, row, size, this));
         }
@@ -144,7 +150,6 @@ void Field::DestroySequence() {
             _gems[0][gem->column()] = generateGem(0, gem->column(), gem->size());
             gem->destroy();
         }
-
     }
     _toDestroy.clear();
 }
@@ -162,10 +167,29 @@ void Field::CheckAbove() {
     _shifted.fill(-1);
 }
 
-void Field::updateGems() {
-    for (auto& row : _gems) {
-        for (auto gem: row) {
-            gem->update();
-        }
+void Field::CheckWholeField() {
+    _shifted.fill(_rows - 1);
+    CheckAbove();
+}
+
+void Field::execCheckQuery() {
+    for (int i = 0; i < _checkQuery.size(); i++) {
+        CheckGem(_checkQuery[i]->row(), _checkQuery[i]->column());
     }
+    _checkQuery.clear();
+}
+
+void Field::execDestroyQuery() {
+    for (int i = 0; i < _destroyQuery.size(); i++) {
+        auto gem = _destroyQuery[i];
+        _shifted[gem->column()] = std::max(_shifted[gem->column()], gem->row());
+        for (int i = gem->row(); i > 0; i--) {
+            _gems[i][gem->column()] = _gems[i - 1][gem->column()];
+            _gems[i][gem->column()]->changeRow(i);
+        }
+        _gems[0][gem->column()] = generateGem(0, gem->column(), gem->size());
+        gem->destroy();
+    }
+    CheckAbove();
+    _destroyQuery.clear();
 }

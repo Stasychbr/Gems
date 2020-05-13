@@ -11,14 +11,15 @@ private:
     static const int _columns = 10;
     static const int _seqLen = 3;
     static const int _bonusChance = 10; // chance = 1/n
-    static const int _bonusNum = 1;
+    static const int _bonusNum = 2;
 
     std::vector<std::vector<std::shared_ptr<Gem>>> _gems;
     QRectF _area;
 
     std::shared_ptr<Gem> _selectedGem = NULL;
     std::vector<std::shared_ptr<Gem>> _toDestroy;
-    std::vector<std::shared_ptr<Gem>> _toCheck;
+    std::vector<std::shared_ptr<Gem>> _checkQuery;
+    std::vector<std::shared_ptr<Gem>> _destroyQuery;
     std::array <int, _columns> _shifted;
 
     enum class LastCheckedGem {
@@ -36,8 +37,10 @@ private:
     void CheckGem(int row, int col);
     void DestroySequence();
     void CheckAbove();
+    void CheckWholeField();
 
-    void updateGems();
+    void execCheckQuery();
+    void execDestroyQuery();
 public:
     Field(QRectF& area);
     ~Field();
@@ -46,6 +49,7 @@ public:
     int rows();
     int columns();
     void CheckLater(std::shared_ptr<Gem> gem);
+    void DestroyLater(std::shared_ptr<Gem> gem);
     void SelectGem(int row, int col);
     std::shared_ptr<Gem> gemAt(int row, int column);
 };

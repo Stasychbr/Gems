@@ -10,7 +10,7 @@ class Field;
 class Gem: public QGraphicsObject {
 public:
     enum class AnimationType {
-        DESTROY,
+        CREATE,
         MOVE,
         SWAP,
     };
@@ -29,7 +29,6 @@ private:
     void slidingAnim(AnimationType type = AnimationType::MOVE);
     void selectAnim();
     void unselectAnim();
-    //void destroyAnim();
 
 protected:
     Field* _field = NULL;
