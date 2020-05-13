@@ -9,6 +9,8 @@ private:
     static const int _rows = 10;
     static const int _columns = 10;
     static const int _seqLen = 3;
+    static const int _bonusChance = 10; // chance = 1/n
+    static const int _bonusNum = 1;
 
     std::vector<std::vector<Gem*>> _gems;
     QRectF _area;
@@ -23,6 +25,8 @@ private:
         LEFT,
         RIGHT
     };
+
+    Gem* generateGem(int row, int column, int size);
 
     void SwapGems(int row, int col);
     void CheckSequence(int i, int j, LastCheckedGem destination, QColor const& color);

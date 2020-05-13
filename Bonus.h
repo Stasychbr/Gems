@@ -1,20 +1,16 @@
 #pragma once
 #include "Gem.h"
-#include "Field.h"
-#include <memory>
 
-class Bonus {
+class Bonus: public Gem {
 private:
     static const int _radius = 3;
-    static const int _bonusNum = 1;
+    static const int _bonusAniLen = 150;
+    QPropertyAnimation* _bonusAnim = NULL;
 protected:
-    Field* _field = NULL;
-    Gem* _owner = NULL;
     Gem* target();
 public:
-    Bonus(Field* field, Gem* gem);
-    virtual void effect() = 0;
-    static int totalNumber();
-    static /*std::shared_ptr <Bonus>*/ Bonus* rollBonus(Field* field, Gem* owner);
+    Bonus(int posX, int posY, int size, QGraphicsItem* parent);
+    ~Bonus();
+    virtual void bonusAction() = 0;
 };
 

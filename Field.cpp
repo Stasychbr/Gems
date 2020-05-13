@@ -4,25 +4,18 @@
 #include <QGraphicsSceneMouseEvent>
 #include <array>
 #include <QPropertyAnimation>
+#include <QRandomGenerator>
+#include <random>
+#include "PaintCan.h"
 
 Field::Field(QRectF& area) {
     int size = (int)(fmin<double, double>(area.width(), area.height()) / fmax<int, int>(_rows, _columns));
+    
     _gems.resize(_rows);
     _shifted.fill(-1);
     for (int i = 0; i < _rows; i++) {
         for (int j = 0; j < _columns; j++) {
-            if (i == 0 && j == 0) {
-                _gems[i].push_back(new Gem(j, i, size, this));
-            }
-            else if (i == 0) {
-                _gems[i].push_back(new Gem(j, i, size, this, &(_gems[i][j - 1]->color())));
-            }
-            else if (j == 0) {
-                _gems[i].push_back(new Gem(j, i, size, this, NULL, &(_gems[i - 1][j]->color())));
-            }
-            else {
-                _gems[i].push_back(new Gem(j, i, size, this, &(_gems[i][j - 1]->color()), &(_gems[i - 1][j]->color())));
-            }
+            _gems[i].push_back(generateGem(i, j, size));
         }
     }
     _area = area;
@@ -85,6 +78,22 @@ void Field::SelectGem(int row, int col) {
     }
 }
 
+Gem* Field::generateGem(int row, int column, int size) {
+    std::uniform_int_distribution<int> distribution(0, _bonusChance);
+    if (distribution(*QRandomGenerator::global()) == 0) {
+        std::uniform_int_distribution<int> bonusChoice(1, _bonusNum);
+        switch (bonusChoice(*QRandomGenerator::global())) {
+        case 1:
+            return (Gem*)new PaintCan(column, row, size, this);
+        default:
+            return new Gem(column, row, size, this);
+        }
+    }
+    else {
+        return new Gem(column, row, size, this);
+    }
+}
+
 void Field::SwapGems(int row, int col) {
     _gems[_selectedGem->row()][_selectedGem->column()] = _gems[row][col];
     _gems[row][col]->changeRow(_selectedGem->row(), Gem::AnimationType::SWAP);
@@ -124,8 +133,8 @@ void Field::DestroySequence() {
                 _gems[i][gem->column()] = _gems[i - 1][gem->column()];
                 _gems[i][gem->column()]->changeRow(i);
             }
-            _gems[0][gem->column()] = gem;
-            gem->destroy();
+            _gems[0][gem->column()] = generateGem(0, gem->column(), gem->size());
+            delete gem;
         }
 
     }

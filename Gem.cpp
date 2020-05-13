@@ -1,24 +1,34 @@
 #include "Gem.h"
 #include "Field.h"
 #include <QPainter>
-#include <QRandomGenerator>
 #include <QPropertyAnimation>
-#include <random>
+#include <QRandomGenerator>
 
 
-
-Gem::Gem(int posX, int posY, int size, QGraphicsItem* parent, QColor* leftColor, QColor* upColor) {
+Gem::Gem(int posX, int posY, int size, QGraphicsItem* parent) {
     _size = size;
     _posX = posX;
     _posY = posY;
+    _field = (Field*)parent;
     _color = getColor();
-    _hasBonus = isBonus();
-    bonusAnim();
-    while (leftColor && _color == *leftColor || upColor && _color == *upColor) {
-        _color = getColor();
+    if (posX != 0 && posY != 0) {
+        while (_field->gemAt(posY - 1, posX)->color() == _color || _field->gemAt(posY, posX - 1)->color() == _color) {
+            _color = getColor();
+        }
+    }
+    else if (posX != 0) {
+        while (_field->gemAt(posY, posX - 1)->color() == _color) {
+            _color = getColor();
+        }
+    }
+    else if (posY != 0) {
+        while (_field->gemAt(posY - 1, posX)->color() == _color) {
+            _color = getColor();
+        }
     }
     setParentItem(parent);
-    this->setPos(this->calcPos());
+    //this->setPos(this->calcPos());
+    slidingAnim(AnimationType::DESTROY);
 }
 
 Gem::Gem(const Gem& t) {
@@ -26,31 +36,18 @@ Gem::Gem(const Gem& t) {
     _posX = t._posX;
     _posY = t._posY;
     _color = t._color;
-    _hasBonus = t._hasBonus;
-    bonusAnim();
+    _field = t._field;
     setParentItem(t.parentItem());
     this->setPos(this->calcPos());
 
 }
 
 Gem::~Gem() {
-    if (_hasBonus) {
-        delete _bonusAnim;
-    }
 }
 
 QPointF Gem::calcPos() {
-    return QPointF(_size * _posX + 0.5 * _size,  _size * _posY + 0.5 * _size);
+    return QPointF(_size * _posX + 0.5 * _size, _size * _posY + 0.5 * _size);
 }
-
-bool Gem::isBonus() {
-    std::uniform_int_distribution<int> distribution(0, _bonusChance);
-    return distribution(*QRandomGenerator::global()) == 0;
-}
-
-//void Gem::bonusManagement() {
-//    _bonus = Bonus::rollBonus((Field*)parentItem(), this);
-//}
 
 void Gem::slidingAnim(AnimationType type) {
     QPropertyAnimation* anim = new QPropertyAnimation(this, "pos");
@@ -79,32 +76,16 @@ void Gem::unselectAnim() {
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void Gem::bonusAnim() {
-    if (_hasBonus == (bool)_bonusAnim) {
-        return;
-    }
-    if (_hasBonus && !_bonusAnim) {
-        _bonusAnim = new QPropertyAnimation(this, "rotation");
-        _bonusAnim->setStartValue(0);
-        _bonusAnim->setEndValue(0);
-        _bonusAnim->setDuration(_aniShakeLen);
-        _bonusAnim->setKeyValueAt(0.25, 5);
-        _bonusAnim->setKeyValueAt(0.75, -5);
-        _bonusAnim->setLoopCount(-1);
-        _bonusAnim->start();
-    }
-    else {
-        delete _bonusAnim;
-        _bonusAnim = NULL;
-    }
-}
-
 int Gem::row() {
     return _posY;
 }
 
 int Gem::column() {
     return _posX;
+}
+
+int Gem::size() {
+    return _size;
 }
 
 QColor Gem::color() {
@@ -151,17 +132,6 @@ void Gem::updatePos() {
     this->setPos(calcPos());
 }
 
-void Gem::destroy() {
-    /*if (_hasBonus) {
-        _bonus->effect();
-    }*/
-    _hasBonus = isBonus();
-    bonusAnim();
-    setRotation(0);
-    changeColor();
-    changeRow(0, AnimationType::DESTROY);
-}
-
 QColor Gem::getColor() {
     int color = QRandomGenerator::global()->bounded(0, 8);
     switch (color) {
@@ -187,7 +157,7 @@ QColor Gem::getColor() {
 }
 
 QRectF Gem::boundingRect() const {
-    return QRectF(- 0.5 * _size, -0.5 * _size, _size, _size);
+    return QRectF(-0.5 * _size, -0.5 * _size, _size, _size);
 }
 
 void Gem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
