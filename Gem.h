@@ -51,8 +51,6 @@ public:
     void unselect();
     virtual void destroy();
 
-    void updatePos();
-
     QRectF boundingRect() const;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
     void mousePressEvent(QGraphicsSceneMouseEvent* event);

@@ -131,10 +131,6 @@ void Gem::unselect() {
 void Gem::destroy() {
 }
 
-void Gem::updatePos() {
-    this->setPos(calcPos());
-}
-
 QColor Gem::getColor() {
     int color = QRandomGenerator::global()->bounded(0, 8);
     switch (color) {
