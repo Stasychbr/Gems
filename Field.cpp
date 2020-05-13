@@ -21,11 +21,6 @@ Field::Field(QRectF& area) {
 }
 
 Field::~Field() {
-    /*for (int i = 0; i < _rows; i++) {
-        for (int j = 0; j < _columns; j++) {
-            delete _gems[i][j];
-        }
-    }*/
 }
 
 QRectF Field::boundingRect() const {
@@ -47,6 +42,10 @@ int Field::columns() {
     return _columns;
 }
 
+void Field::CheckLater(std::shared_ptr<Gem> gem) {
+    _toCheck.push_back(gem);
+}
+
 std::shared_ptr<Gem> Field::gemAt(int row, int column) {
     if (row < 0 || row >= _rows || column < 0 || column >= _columns) {
         return NULL;
@@ -65,16 +64,21 @@ void Field::SelectGem(int row, int col) {
         int tmpCol = _selectedGem->column(); //!
         if (abs(tmpRow - row) == 1 && tmpCol == col || abs(tmpCol - col) == 1 && tmpRow == row) {
             SwapGems(row, col);
-            CheckSequence(row, col, LastCheckedGem::NO_CHECK, _gems[row][col]->color());
-            DestroySequence();
-            CheckAbove();
-            CheckSequence(tmpRow, tmpCol, LastCheckedGem::NO_CHECK, _gems[tmpRow][tmpCol]->color());
-            DestroySequence();
-            CheckAbove();
+            CheckGem(row, col);
+            CheckGem(tmpRow, tmpCol);
+            for (int i = 0; i < _toCheck.size(); i++) {
+                CheckGem(_toCheck[i]->row(), _toCheck[i]->column());
+            }
+            _toCheck.clear();
         }
         _selectedGem = NULL;
-        //updateGems();
     }
+}
+
+void Field::CheckGem(int row, int col) {
+    CheckSequence(row, col, LastCheckedGem::NO_CHECK, _gems[row][col]->color());
+    DestroySequence();
+    CheckAbove();
 }
 
 std::shared_ptr<Gem> Field::generateGem(int row, int column, int size) {
@@ -106,6 +110,11 @@ void Field::SwapGems(int row, int col) {
 void Field::CheckSequence(int i, int j, LastCheckedGem destination, QColor const& color) {
     if (i < 0 || i >= _rows || j < 0 || j >= _columns) {
         return;
+    }
+    if (_toDestroy.size() >= _seqLen + 1) {
+        if (_gems[i][j] == _toDestroy[_toDestroy.size() - 4]) {
+            return;
+        }
     }
     if (color == _gems[i][j]->color()) {
         _toDestroy.push_back(_gems[i][j]);
@@ -144,6 +153,9 @@ void Field::CheckAbove() {
     for (int i = 0; i < _columns; i++) {
         for (int j = _shifted[i]; j >= 0; j--) {
             CheckSequence(j, i, LastCheckedGem::NO_CHECK, _gems[j][i]->color());
+            if (_toDestroy.size() >= _seqLen) {
+                j++;
+            }
             DestroySequence();
         }
     }

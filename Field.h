@@ -18,7 +18,9 @@ private:
 
     std::shared_ptr<Gem> _selectedGem = NULL;
     std::vector<std::shared_ptr<Gem>> _toDestroy;
+    std::vector<std::shared_ptr<Gem>> _toCheck;
     std::array <int, _columns> _shifted;
+
     enum class LastCheckedGem {
         NO_CHECK,
         UP,
@@ -31,6 +33,7 @@ private:
 
     void SwapGems(int row, int col);
     void CheckSequence(int i, int j, LastCheckedGem destination, QColor const& color);
+    void CheckGem(int row, int col);
     void DestroySequence();
     void CheckAbove();
 
@@ -42,6 +45,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
     int rows();
     int columns();
+    void CheckLater(std::shared_ptr<Gem> gem);
     void SelectGem(int row, int col);
     std::shared_ptr<Gem> gemAt(int row, int column);
 };

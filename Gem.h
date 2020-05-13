@@ -4,7 +4,6 @@
 #include <QGraphicsWidget>
 #include <QPropertyAnimation>
 #include <memory>
-//#include "Field.h"
 
 class Field;
 
@@ -30,7 +29,7 @@ private:
     void slidingAnim(AnimationType type = AnimationType::MOVE);
     void selectAnim();
     void unselectAnim();
-    void destroyAnim();
+    //void destroyAnim();
 
 protected:
     Field* _field = NULL;

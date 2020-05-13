@@ -34,8 +34,3 @@ Bonus::Bonus(int posX, int posY, int size, QGraphicsItem* parent) : Gem(posX, po
 Bonus::~Bonus() {
     delete _bonusAnim;
 }
-
-//int Bonus::totalNumber() {
-//    return _bonusNum;
-//}
-

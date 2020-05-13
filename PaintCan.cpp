@@ -36,7 +36,11 @@ void PaintCan::bonusAction() {
 
     victim2->changeColor(color());
     victim2->select();
-    victim1->unselect();
+    victim2->unselect();
+
+    _field->CheckLater(mainTarget);
+    _field->CheckLater(victim1);
+    _field->CheckLater(victim2);
 }
 
 void PaintCan::destroy() {

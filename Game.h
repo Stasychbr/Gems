@@ -12,8 +12,8 @@ public:
     Game(QWidget *parent = Q_NULLPTR);
     ~Game();
 private:
-    const int _vertSize = 600;
-    const int _horSize = 800;
+    static const int _vertSize = 600;
+    static const int _horSize = 600;
 
     QGraphicsView* _centralWidget = NULL;
     QGraphicsScene* _scene;
